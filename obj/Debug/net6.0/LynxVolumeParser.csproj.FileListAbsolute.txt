@@ -1,0 +1,15 @@
+C:\codeBASE\Lynx\LynxVolumeParser\LynxVolumeParser\bin\Debug\net6.0\LynxVolumeParser.exe
+C:\codeBASE\Lynx\LynxVolumeParser\LynxVolumeParser\bin\Debug\net6.0\LynxVolumeParser.deps.json
+C:\codeBASE\Lynx\LynxVolumeParser\LynxVolumeParser\bin\Debug\net6.0\LynxVolumeParser.runtimeconfig.json
+C:\codeBASE\Lynx\LynxVolumeParser\LynxVolumeParser\bin\Debug\net6.0\LynxVolumeParser.dll
+C:\codeBASE\Lynx\LynxVolumeParser\LynxVolumeParser\bin\Debug\net6.0\LynxVolumeParser.pdb
+C:\codeBASE\Lynx\LynxVolumeParser\LynxVolumeParser\obj\Debug\net6.0\LynxVolumeParser.csproj.AssemblyReference.cache
+C:\codeBASE\Lynx\LynxVolumeParser\LynxVolumeParser\obj\Debug\net6.0\LynxVolumeParser.GeneratedMSBuildEditorConfig.editorconfig
+C:\codeBASE\Lynx\LynxVolumeParser\LynxVolumeParser\obj\Debug\net6.0\LynxVolumeParser.AssemblyInfoInputs.cache
+C:\codeBASE\Lynx\LynxVolumeParser\LynxVolumeParser\obj\Debug\net6.0\LynxVolumeParser.AssemblyInfo.cs
+C:\codeBASE\Lynx\LynxVolumeParser\LynxVolumeParser\obj\Debug\net6.0\LynxVolumeParser.csproj.CoreCompileInputs.cache
+C:\codeBASE\Lynx\LynxVolumeParser\LynxVolumeParser\obj\Debug\net6.0\LynxVolumeParser.dll
+C:\codeBASE\Lynx\LynxVolumeParser\LynxVolumeParser\obj\Debug\net6.0\refint\LynxVolumeParser.dll
+C:\codeBASE\Lynx\LynxVolumeParser\LynxVolumeParser\obj\Debug\net6.0\LynxVolumeParser.pdb
+C:\codeBASE\Lynx\LynxVolumeParser\LynxVolumeParser\obj\Debug\net6.0\LynxVolumeParser.genruntimeconfig.cache
+C:\codeBASE\Lynx\LynxVolumeParser\LynxVolumeParser\obj\Debug\net6.0\ref\LynxVolumeParser.dll
