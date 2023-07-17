@@ -3,36 +3,33 @@ using System.Collections;
 
 public class LynxVolumeParser
 {
-	private string inputTransferVolumeString;
-    private string outputTransferVolumeString;
-    private bool blowoutPresent;
-    private bool needsAdjustment;
     private const double MAX_TIP_VOL = 200.0;
     private int parseCount = 0;
-    private List<int> splitOccuranceList = new List<int>();
-    private List<string> volumeList = new List<string>(); //noBlowoutVolList_Parsed & volListWithBlowout_Parsed
-    private List<int> volumeFragmentsNeededList = new List<int>();  //volListWithBlowout_SplitList & newVolList_volListWithBlowout
-    private List<string> blowoutVolumeList = new List<string>(); // new
-    private List<double> updatedVolumeList = new List<double>(); //new
+    private string InputTransferVolumeString { get; set; }
+    private string OutputTransferVolumeString { get; set; }
+    private bool BlowoutPresent { get; set; }
+    private bool NeedsAdjustment { get; set; }
+    private List<double> VolumeList { get; set; }
+    private List<int> VolumeFragmentsNeededList { get; set; }
+    private List<string> BlowoutVolumeList { get; set; }
+    private List<double> UpdatedVolumeList { get; set; }
 
-    public string InputTransferVolumeString {
-        get { return this.inputTransferVolumeString; }
-        set { this.inputTransferVolumeString = value;} 
-    }
+    public List<int> SplitOccuranceList { get; set; }
+    public int TransferCycleCount { get; set; }
 
-    public string OutputTransferVolumeString {
-        get { return this.outputTransferVolumeString; }
-        set { this.outputTransferVolumeString = value;}
-    }
+    // Constructor
+    public LynxVolumeParser(string inputVolList)
+    {
+        SplitOccuranceList = new List<int>();
+        VolumeList = new List<double>();
+        VolumeFragmentsNeededList = new List<int>();
+        BlowoutVolumeList = new List<string>();
+        UpdatedVolumeList = new List<double>();
 
-    public bool BlowoutPresent { 
-        get { return this.blowoutPresent;}
-        set { this.blowoutPresent = value;}
-    }
-
-    private bool NeedsAdjustment { 
-        get { return this.needsAdjustment; }
-        set { this.needsAdjustment = value; }
+        InputTransferVolumeString = inputVolList;
+        SplitInput();
+        for (int i = 0; i < 96; i++)
+            SplitOccuranceList.Add(0);
     }
 
     private int ParseCount { 
@@ -40,61 +37,20 @@ public class LynxVolumeParser
         set { this.parseCount = value; }
     }
 
-    public List<int> SplitOccuranceList {
-        get { return this.splitOccuranceList; }
-        set { this.splitOccuranceList = value;}
-    }
-
-    public List<string> VolumeList {
-        get { return this.volumeList; }
-        set { this.volumeList = value;}
-    }
-
-    public List<int> VolumeFragmentsNeededList {   
-        get { return this.volumeFragmentsNeededList; }
-        set { this.volumeFragmentsNeededList = value;}
-    }
-
-    public List<string> BlowoutVolumeList {
-        get { return this.blowoutVolumeList; }
-        set { this.blowoutVolumeList = value;}
-    }
-
-    public List<double> UpdatedVolumeList {
-        get { return this.updatedVolumeList; }
-        set { this.updatedVolumeList = value; }
-    }
-
-
-    // Constructor
-    public LynxVolumeParser(string inputVolList) { 
-        this.inputTransferVolumeString = inputVolList;
-        for (int i = 0; i < 96; i++)
-            splitOccuranceList.Add(0);
-    }
-
     // Splits volume string into a List depending on if blowout is prestn or not
-    public void SplitInput()
+    public void SplitInput() // HELPER
     {
         if (InputTransferVolumeString.Substring(9).Contains(';')) { BlowoutPresent = true; }
         else { BlowoutPresent = false; }
         string[] tempList = InputTransferVolumeString.Split(',');
-        if (!BlowoutPresent) { for (int i = 1; i < tempList.Length; i++) { VolumeList.Add(tempList[i]); } }
+        if (!BlowoutPresent) { for (int i = 1; i < tempList.Length; i++) { VolumeList.Add(Convert.ToDouble(tempList[i])); } }
         else {
             for (int i = 1; i < tempList.Length; i++) {
                 string[] dispenseTempList = tempList[i].Split(';');
-                VolumeList.Add(dispenseTempList[0]);
+                VolumeList.Add(Convert.ToDouble(dispenseTempList[0]));
                 BlowoutVolumeList.Add(dispenseTempList[1]);
             }
         }
-
-        // For testing - delete later
-        /*
-        foreach (var item in volumeList) {
-            Console.Write(item + ", ");
-        }
-        Console.WriteLine();
-        */
     }
 
     public void CheckAdjustmentNeeds()
@@ -107,6 +63,7 @@ public class LynxVolumeParser
     }
 
     // Creates a list of need iteration of aspiration and dispensing
+    // Max value of VolumeFragmentsNeededList will control the cycle count of trasnfer
     public void CreateFragmentsList() {
         for (int i = 0; i < VolumeList.Count; i++) {
             int volSplitCount_Temp = 0; 
@@ -115,14 +72,17 @@ public class LynxVolumeParser
             VolumeFragmentsNeededList.Add(volSplitCount_Temp);
         }
 
+        // Find max volume
+
         // For testing - delete later
-        /*
+        TransferCycleCount = VolumeFragmentsNeededList.Max();
+
         Console.Write("Split Count List: ");
         foreach (var item in VolumeFragmentsNeededList) {
             Console.Write(item + ", ");
         }
         Console.WriteLine();
-        */
+        
     }
 
     // Creates updated volume list
@@ -149,7 +109,7 @@ public class LynxVolumeParser
         if (BlowoutPresent) {
             for (int i = 0; i < UpdatedVolumeList.Count(); i++) {
                 OutputTransferVolumeString += Convert.ToString(UpdatedVolumeList[i]) + ";";
-                if (UpdatedVolumeList[i] > 0) { OutputTransferVolumeString += blowoutVolumeList[i] + ","; }
+                if (UpdatedVolumeList[i] > 0) { OutputTransferVolumeString += BlowoutVolumeList[i] + ","; }
                 else { OutputTransferVolumeString += "0.0,"; }
             }
         }
@@ -162,12 +122,12 @@ public class LynxVolumeParser
         OutputTransferVolumeString = OutputTransferVolumeString.Substring(0, OutputTransferVolumeString.Length - 1);
     }
 
-    public String VolumeParserDriver() {
+    public String VolumeParserDriver() // Main?
+    {
         Console.WriteLine("Strating...");
-        if (ParseCount == 0) { SplitInput(); }
         CheckAdjustmentNeeds();
         if (NeedsAdjustment) {
-            if (ParseCount == 0) { CreateFragmentsList(); }
+            if (ParseCount == 0) { CreateFragmentsList(); } //Max value created here
             CreateNewVolList();
             CreateNewVolString();
             ParseCount++;
