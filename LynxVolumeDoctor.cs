@@ -50,12 +50,15 @@ public class LynxVolumeDoctor
         {
             int volSplitCount_Temp = 0;
             double currentVol = Convert.ToDouble(VolumeList[i]);
-            volSplitCount_Temp = (int)(currentVol / TipVolMax);
+            if (currentVol <= TipVolMax) { volSplitCount_Temp = 0; }
+            else { volSplitCount_Temp = (int)(currentVol / TipVolMax); }
+            if (volSplitCount_Temp == 1) { volSplitCount_Temp++; }
             VolumeFragmentsNeededList.Add(volSplitCount_Temp);
         }
 
         // Find max volume
         TransferCycleCount = VolumeFragmentsNeededList.Max();
+        Console.WriteLine(TransferCycleCount.ToString());
     }
 
     // Creates updated volume list
