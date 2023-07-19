@@ -20,6 +20,20 @@ class Program
 
         // TESTING: PARSER  ///////////////////////////////////////////////////////////////////////////
 
+        LynxVolumeDoctor docotr1 = new LynxVolumeDoctor(volListWithBlowout, 200.0, "96 PCR");
+        int currentCycleCount = 0;
+        do
+        {
+            Console.WriteLine("\nCycle " + (currentCycleCount + 1) + ": ");
+            string output = docotr1.VolumeDoctorDriver();
+            Console.WriteLine(output);
+            for (int j = 0; j < docotr1.SplitOccuranceList.Count(); j++) { Console.Write(docotr1.SplitOccuranceList[j] + ","); }
+            Console.WriteLine();
+            currentCycleCount++;
+        }
+        while (currentCycleCount < docotr1.TransferCycleCount);
+
+        /*
         LynxVolumeParser parser1= new LynxVolumeParser(volListWithBlowout);
         //LynxVolumeParser parser1 = new LynxVolumeParser(noBlowoutVolList);
 
@@ -34,9 +48,9 @@ class Program
             currentCycleCount++;
         }
         while (currentCycleCount < parser1.TransferCycleCount);
-
+        */
         //////////////////////////////////////////////////////////////////////////////////////////////
-        
+
         // TESTING: VOLUME VERIFICATION //////////////////////////////////////////////////////////////
 
         LynxAllowedVolumes validator1 = new LynxAllowedVolumes();

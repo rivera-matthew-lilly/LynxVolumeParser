@@ -52,7 +52,7 @@ public class LynxMixingVolumes
     public void CreateNewMixVolString()
     {
         MixVolumeString = "";
-        MixVolumeString = InputTransferVolumeString.Substring(0, 8)
+        MixVolumeString = InputTransferVolumeString.Substring(0, 8);
         for (int i = 0; i < MixVolumeList.Count(); i++)
         {
         MixVolumeString += Convert.ToString(MixVolumeList[i]) + ",";

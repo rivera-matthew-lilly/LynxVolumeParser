@@ -25,7 +25,6 @@ public class LynxVolumeParser
         VolumeFragmentsNeededList = new List<int>();
         BlowoutVolumeList = new List<string>();
         UpdatedVolumeList = new List<double>();
-
         InputTransferVolumeString = inputVolList;
         SplitInput();
         for (int i = 0; i < 96; i++)
