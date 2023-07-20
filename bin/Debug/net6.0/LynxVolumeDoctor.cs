@@ -2,11 +2,13 @@
 
 public class LynxVolumeDoctor
 {
+    // Universal
     private double TipVolMax;
     private string InputTransferVolumeString { get; set; }
-    private string PlateType { get; set; }
-    private int ParseCount { get; set; }
     private List<double> VolumeList { get; set; }
+
+    // Specific to VOLUME PARSING AND REFACTORING:
+    private int ParseCount { get; set; }
     private string OutputTransferVolumeString { get; set; }
     private bool NeedsAdjustment { get; set; }
     private List<int> VolumeFragmentsNeededList { get; set; }
@@ -15,19 +17,44 @@ public class LynxVolumeDoctor
     public List<int> SplitOccuranceList { get; set; }
     public int TransferCycleCount { get; set; }
 
+    // Specific to MIXING STRING CREATION:
+    private const double MIX_SCALING_FACTOR = 0.75;
+    private const int UPPER_MIX_COUNT = 8;
+    private const int LOWER_MIX_COUNT = 5;
+    public int MixCount { get; set; }
+    private List<double> MixVolumeList { get; set; }
+    private string MixVolumeString { get; set; }
+
+    // Specific to MAX VOLUME VALIDATION:
+    private Dictionary<string, double> PlateDictionary { get; set; }
+    private string PlateType { get; set; }
+
+
+    // CONSTRUCTOR
     public LynxVolumeDoctor(string inputVolList, double tipVolMax, string plateType)
     {
+        // Universal
         InputTransferVolumeString = inputVolList;
         TipVolMax = tipVolMax;
-        PlateType = plateType;
-        ParseCount = 0;
         VolumeList = FormatLynxVolume.ExtractVolList(inputVolList);
+        PlateType = plateType;
+
+        // Specific to VOLUME PARSING AND REFACTORING:
+        ParseCount = 0;
         VolumeFragmentsNeededList = new List<int>();
         BlowoutVolumeList = new List<double>();
         UpdatedVolumeList = new List<double>();
         SplitOccuranceList = new List<int>();
         for (int i = 0; i < 96; i++)
             SplitOccuranceList.Add(0);
+
+        // Specific to MIXING STRING CREATION:
+        MixCount = 0;
+        MixVolumeList = new List<double>();
+
+        // Specific to MAX VOLUME VALIDATION:
+        PlateDictionary = new Dictionary<string, double>();
+        PlateType = plateType;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -52,14 +79,12 @@ public class LynxVolumeDoctor
             double currentVol = Convert.ToDouble(VolumeList[i]);
             if (currentVol <= TipVolMax) { volSplitCount_Temp = 0; }
             else { volSplitCount_Temp = (int)(currentVol / TipVolMax); }
-
             if (volSplitCount_Temp == 1) { volSplitCount_Temp++; }
             VolumeFragmentsNeededList.Add(volSplitCount_Temp);
         }
 
         // Find max volume
         TransferCycleCount = VolumeFragmentsNeededList.Max();
-        Console.WriteLine(TransferCycleCount.ToString());
     }
 
     // Creates updated volume list
@@ -96,7 +121,7 @@ public class LynxVolumeDoctor
                 UpdateVolList();
                 OutputTransferVolumeString = FormatLynxVolume.ConvertListToVolString(InputTransferVolumeString, UpdatedVolumeList, BlowoutVolumeList, true);
             }
-            else 
+            else
             {
                 UpdateVolList();
                 OutputTransferVolumeString = FormatLynxVolume.ConvertListToVolString(InputTransferVolumeString, UpdatedVolumeList);
@@ -113,7 +138,69 @@ public class LynxVolumeDoctor
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////// START: MIXING STRING CREATION /////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void setMixingCycle()
+    {
+        double maxVol = VolumeList.Max();
+        if (maxVol > TipVolMax) { MixCount = UPPER_MIX_COUNT; }
+        else { MixCount = LOWER_MIX_COUNT; }
+    }
+
+    public void CreateMixVolList()
+    {
+        MixVolumeList.Clear();
+        for (int i = 0; i < VolumeList.Count(); i++)
+        {
+            if (VolumeList[i] < TipVolMax)
+            {
+                MixVolumeList.Add(VolumeList[i] * MIX_SCALING_FACTOR);
+            }
+            else { MixVolumeList.Add(TipVolMax); }
+        }
+    }
 
 
+    public String MixingDoctorDriver()
+    {
+        setMixingCycle(); // call 'get MixCount' in main to control mix count
+        CreateMixVolList();
+        MixVolumeString = "";
+        MixVolumeString = FormatLynxVolume.ConvertListToVolString(InputTransferVolumeString, MixVolumeList);
+        return MixVolumeString;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////// END: MIXING STRING CREATION ///////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////// START: MAX VOLUME VALIDATION //////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void addNewPlate(string plateName, double maxVolume)
+    {
+        if (!plateName.Equals("") && maxVolume > 0) { PlateDictionary.Add(plateName, maxVolume); }
+    }
+
+    public void removePlate(string plateName)
+    {
+        if (!plateName.Equals("")) { PlateDictionary.Remove(plateName); }
+    }
+
+    public bool ValidMaxVolDoctorDriver()
+    {
+        double maxVolumeInputString = Convert.ToDouble(VolumeList.Max());
+        double maxVolume = PlateDictionary[PlateType];
+        if (maxVolumeInputString <= maxVolume) { return true; }
+        else { return false; }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////// END: MAX VOLUME VALIDATION ////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }
+

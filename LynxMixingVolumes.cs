@@ -2,15 +2,18 @@
 
 public class LynxMixingVolumes
 {
-    private const double MAX_TIP_VOL = 200.0;
+    private const double MAX_TIP_VOL = 200.0; //
+
     private const double MIX_SCALING_FACTOR = 0.75;
     private const int UPPER_MIX_COUNT = 8;
     private const int LOWER_MIX_COUNT = 5;
-    private string InputTransferVolumeString { get; set; }
-    private List<double> VolumeList { get; set; }
+
+
+    private string InputTransferVolumeString { get; set; } //
+    private List<double> VolumeList { get; set; } //
     private int MixCount { get; set; }
     private List<double> MixVolumeList { get; set; }
-    private string MixVolumeString { get; set; }
+    private string MixVolumeString { get; set; } 
 
     public LynxMixingVolumes()
 	{
